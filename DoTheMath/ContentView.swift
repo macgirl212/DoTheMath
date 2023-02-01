@@ -7,85 +7,14 @@
 
 import SwiftUI
 
-struct MenuView: View {
-    var timesTable: Int
-    var questionsToGo: Int
-    
-    var body: some View {
-        HStack {
-            VStack {
-                Text("Times Table:")
-                Text("\(timesTable)")
-            }
-            VStack {
-                Text("Questions Left:")
-                Text("\(questionsToGo)")
-            }
-        }
-        .padding(.top, 100)
-    }
-}
-
-struct ButtonsView: View {
-    var timesTable: Int
-    var multiple: Int
-    var verifyAnswer: (Int) -> Void
-    
-    var possibleAnswers: [Int] {
-        let timesTable = timesTable
-        let multiple = multiple
-        
-        let correctAnswer = timesTable * multiple
-        let maxNumber = 12 * multiple
-        var numberRange = [Int](1...maxNumber)
-        numberRange.remove(at: correctAnswer)
-        
-        let numberArray = [correctAnswer, numberRange.randomElement() ?? 1, numberRange.randomElement() ?? 1, numberRange.randomElement() ?? 1]
-        // bug happens during shuffle
-        return numberArray.shuffled()
-    }
-    
-    var body: some View {
-        ForEach(0..<4) { number in
-            let choice = possibleAnswers[number]
-            Button {
-                verifyAnswer(choice)
-            } label: {
-                Text("\(choice)")
-            }
-        }
-    }
-}
-
-struct GameView: View {
-    var timesTable: Int
-    
-    @State private var multiple = Int.random(in: 1...12)
-    
-    var body: some View {
-        VStack {
-            Spacer()
-            Text("\(timesTable) X \(multiple)")
-            Spacer()
-            ButtonsView(timesTable: timesTable, multiple: multiple, verifyAnswer: verifyAnswer)
-            Spacer()
-        }
-    }
-    
-    func verifyAnswer(_ playerChoice: Int) {
-        if playerChoice == timesTable * multiple {
-            print("correct")
-        } else {
-            print("sorry")
-        }
-    }
-}
-
 struct ContentView: View {
+    @State private var completedGame = false
+    @State private var isPlayingGame = false
+    @State private var isShowingOptions = true
     @State private var selectedTimesTable = 1
     @State private var selectedQuestionsAmount = 5
-    @State private var isShowingOptions = true
-    @State private var isPlayingGame = false
+    @State private var totalCorrectAnswers = 0
+    @State private var totalQuestions = 5
     
     var body: some View {
         ZStack {
@@ -101,15 +30,24 @@ struct ContentView: View {
                             .padding(10)
                         Spacer()
                         Button("Ok") {
+                            // temporary fix for bug that allows selectedQuestionsAmount to be a negative integer
+                            if selectedQuestionsAmount == 0 {
+                                selectedQuestionsAmount = 5
+                            }
+                            
+                            totalQuestions = selectedQuestionsAmount
+                            totalCorrectAnswers = 0
+                            
                             withAnimation {
                                 toggleGameState()
+                                
                             }
                         }
                         Spacer()
                     }
                 } else {
                     Spacer()
-                    GameView(timesTable: selectedTimesTable)
+                    GameView(timesTable: selectedTimesTable, completedGame: $completedGame, totalCorrectAnswers: $totalCorrectAnswers, questionsToGo: $selectedQuestionsAmount)
                     Spacer()
                     Button("Settings") {
                         withAnimation {
@@ -117,6 +55,11 @@ struct ContentView: View {
                         }
                     } .padding(.bottom, 50)
                 }
+            }
+            .alert("Congratulations!", isPresented: $completedGame) {
+                Button("OK", action: toggleGameState)
+            } message: {
+                Text("You got \(totalCorrectAnswers) out of \(totalQuestions) correct!")
             }
         } .ignoresSafeArea()
     }
