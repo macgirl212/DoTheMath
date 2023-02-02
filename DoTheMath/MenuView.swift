@@ -7,20 +7,34 @@
 
 import SwiftUI
 
+struct MenuBlock: View {
+    var title: String
+    var number: String
+    
+    var body: some View {
+        VStack {
+            Text(title)
+            Text(number)
+                .font(.title)
+        }
+        .padding(10)
+        .frame(width: 140)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
 struct MenuView: View {
     var timesTable: Int
     var questionsToGo: Int
     
     var body: some View {
         HStack {
-            VStack {
-                Text("Times Table:")
-                Text("\(timesTable)")
-            }
-            VStack {
-                Text("Questions Left:")
-                Text("\(questionsToGo)")
-            }
+            Spacer()
+            MenuBlock(title: "Times Table:", number: "\(timesTable)")
+            Spacer()
+            MenuBlock(title: "Questions Left:", number: "\(questionsToGo)")
+            Spacer()
         }
         .padding(.top, 100)
     }

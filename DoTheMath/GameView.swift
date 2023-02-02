@@ -14,16 +14,28 @@ struct GameView: View {
     @Binding public var totalCorrectAnswers: Int
     @Binding public var questionsToGo: Int
 
-    @State public var isShowingAnswer = false
+    @State private var answerTitle = ""
+    @State private var isShowingAnswer = false
     @State private var multiple = Int.random(in: 1...12)
     
     var body: some View {
         VStack {
             Spacer()
-            Text("\(timesTable) X \(multiple)")
+            
+            HStack {
+                Text("\(timesTable)")
+                Image(systemName: "multiply")
+                Text("\(multiple)")
+            }
+            .font(.largeTitle)
+            
             Spacer()
             ButtonsView(possibleAnswers: generatePossibleAnswers(), verifyAnswer: verifyAnswer)
             Spacer()
+        } .alert(answerTitle, isPresented: $isShowingAnswer) {
+            Button("Ok") {
+                isShowingAnswer.toggle()
+            }
         }
     }
     
@@ -42,7 +54,12 @@ struct GameView: View {
     func verifyAnswer(_ playerChoice: Int) {
         if playerChoice == timesTable * multiple {
             totalCorrectAnswers += 1
+            answerTitle = "Correct!"
+        } else {
+            answerTitle = "Oops, try again!"
         }
+        
+        isShowingAnswer = true
         
         multiple = Int.random(in: 1...12)
         questionsToGo -= 1

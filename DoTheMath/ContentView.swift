@@ -18,16 +18,20 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            Color(.yellow)
+            LinearGradient(colors: [Color(red: 0.63, green: 0.77, blue: 1.00), Color(red: 0.74, green: 0.70, blue: 1.00)], startPoint: .top, endPoint: .bottom)
             VStack {
                 MenuView(timesTable: selectedTimesTable, questionsToGo: selectedQuestionsAmount)
                 if isShowingOptions {
                     Section {
                         Spacer()
-                        Stepper("Please select your times table:", value: $selectedTimesTable, in: 1...12)
-                            .padding(10)
-                        Stepper("Please select the amount of questions:", value: $selectedQuestionsAmount, in: 5...20, step: 5)
-                            .padding(10)
+                        Section {
+                            Stepper("Please select your times table:", value: $selectedTimesTable, in: 1...12)
+                                .padding(10)
+                            Stepper("Please select the amount of questions:", value: $selectedQuestionsAmount, in: 5...20, step: 5)
+                                .padding(10)
+                        }
+                        .padding(10)
+                        .background(.regularMaterial)
                         Spacer()
                         Button("Ok") {
                             // temporary fix for bug that allows selectedQuestionsAmount to be a negative integer
@@ -43,17 +47,28 @@ struct ContentView: View {
                                 
                             }
                         }
+                        .padding(10)
+                        .font(.title)
+                        .background(.ultraThickMaterial)
+                        .clipShape(Capsule())
                         Spacer()
                     }
                 } else {
                     Spacer()
                     GameView(timesTable: selectedTimesTable, completedGame: $completedGame, totalCorrectAnswers: $totalCorrectAnswers, questionsToGo: $selectedQuestionsAmount)
                     Spacer()
-                    Button("Settings") {
+                    Button {
                         withAnimation {
                             toggleGameState()
                         }
-                    } .padding(.bottom, 50)
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                    .padding(10)
+                    .font(.title)
+                    .background(.ultraThickMaterial)
+                    .clipShape(Capsule())
+                    .padding(.bottom, 50)
                 }
             }
             .alert("Congratulations!", isPresented: $completedGame) {

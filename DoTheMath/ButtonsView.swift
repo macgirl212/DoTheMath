@@ -21,10 +21,12 @@ struct ButtonsView: View {
                 verifyAnswer(choice)
             } label: {
                 Text("\(choice)")
+                    .font(.title2)
             }
             .padding(20)
-            .frame(width: 200, height: 50)
-            .background(.white)
+            .frame(width: 200)
+            .background(.regularMaterial)
+            .clipShape(Capsule())
         }
     }
     
